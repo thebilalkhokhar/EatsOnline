@@ -6,8 +6,6 @@ const Cart = require("../models/Cart");
 const User = require("../models/User");
 const Restaurant = require("../models/Restaurant");
 const { authMiddleware, adminMiddleware } = require("../middleware/auth");
-const Review = require("../models/Review");
-const mongoose = require("mongoose");
 
 // @route   POST /api/orders
 router.post("/", authMiddleware, async (req, res) => {
@@ -132,8 +130,8 @@ router.get("/", authMiddleware, async (req, res) => {
 
     console.log("Fetching orders with query:", query); // Debug log
     const orders = await Order.find(query)
-      .populate("items.product", "name price image")
       .populate("restaurantId", "name")
+      .populate("items.product", "name price image")
       .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
@@ -142,120 +140,34 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-// @route   GET /api/orders/:id
-router.get("/:id", authMiddleware, async (req, res) => {
+// @route   GET /api/orders/:orderId
+router.get("/:orderId", authMiddleware, async (req, res) => {
   try {
-    console.log("Fetching order details for ID:", req.params.id);
-    console.log("User context:", { 
-      userId: req.user.userId, 
-      role: req.user.role 
-    });
+    console.log('Fetching order:', req.params.orderId); // Debug log
+    const order = await Order.findById(req.params.orderId)
+      .populate("user", "name email")
+      .populate({
+        path: "restaurantId",
+        select: "name"
+      })
+      .populate("items.product", "name price image");
 
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      console.log("Invalid ObjectId format:", req.params.id);
-      return res.status(400).json({ message: "Invalid order ID format" });
-    }
-
-    // First try to find the order without population to check if it exists
-    const orderExists = await Order.findById(req.params.id);
-    if (!orderExists) {
-      console.log("Order not found in database:", req.params.id);
+    if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // If order exists, try to populate all fields
-    try {
-      const order = await Order.findById(req.params.id)
-        .populate({
-          path: "items.product",
-          select: "name price image",
-          model: "Product"
-        })
-        .populate({
-          path: "restaurantId",
-          select: "name",
-          model: "Restaurant"
-        })
-        .populate({
-          path: "user",
-          select: "name _id",
-          model: "User"
-        });
+    console.log('Order data:', order); // Debug log
+    console.log('Restaurant data:', order.restaurantId); // Debug log
 
-      // Log the raw order data for debugging
-      console.log("Raw order data:", JSON.stringify({
-        id: order._id,
-        userId: order.user?._id,
-        restaurantId: order.restaurantId?._id,
-        items: order.items?.length,
-        status: order.status
-      }, null, 2));
-
-      // Get the current user
-      const currentUser = await User.findById(req.user.userId);
-      if (!currentUser) {
-        console.log("Current user not found:", req.user.userId);
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Authorization check with detailed logging
-      const isOwnOrder = order.user?._id.toString() === currentUser._id.toString();
-      const isRestaurantAdmin = currentUser.role === "admin" && 
-                              currentUser.restaurantId && 
-                              order.restaurantId?._id.toString() === currentUser.restaurantId.toString();
-
-      console.log("Authorization details:", {
-        isOwnOrder,
-        isRestaurantAdmin,
-        userMatch: {
-          orderUserId: order.user?._id.toString(),
-          currentUserId: currentUser._id.toString(),
-          matches: order.user?._id.toString() === currentUser._id.toString()
-        },
-        restaurantMatch: {
-          orderRestaurantId: order.restaurantId?._id.toString(),
-          userRestaurantId: currentUser.restaurantId?.toString(),
-          matches: order.restaurantId?._id.toString() === currentUser.restaurantId?.toString()
-        }
-      });
-
-      if (!isOwnOrder && !isRestaurantAdmin) {
-        return res.status(403).json({ 
-          message: "Not authorized to view this order",
-          details: {
-            isOwnOrder,
-            isRestaurantAdmin,
-            userRole: currentUser.role
-          }
-        });
-      }
-
-      res.json(order);
-    } catch (populateError) {
-      console.error("Error during population:", {
-        error: populateError.message,
-        stack: populateError.stack
-      });
-      return res.status(500).json({ 
-        message: "Error loading order details",
-        details: populateError.message
-      });
+    // Check if the user is authorized to view this order
+    if (order.user._id.toString() !== req.user.userId && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to view this order" });
     }
+
+    res.json(order);
   } catch (error) {
-    console.error("Order details error:", {
-      error: error.message,
-      stack: error.stack,
-      orderId: req.params.id,
-      userId: req.user?.userId
-    });
-    
-    if (error.kind === "ObjectId") {
-      return res.status(400).json({ message: "Invalid order ID format" });
-    }
-    res.status(500).json({ 
-      message: "Server error", 
-      details: error.message 
-    });
+    console.error('Error in GET /api/orders/:orderId:', error); // Debug log
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
@@ -330,31 +242,17 @@ router.get("/admin/orders", adminMiddleware, async (req, res) => {
   }
 });
 
-// Get orders eligible for review
-router.get("/eligible-for-review/:restaurantId", authMiddleware, async (req, res) => {
+// @route   GET /api/orders/:id/status
+router.get("/:id/status", async (req, res) => {
   try {
-    const { restaurantId } = req.params;
-    
-    // Find delivered orders that haven't been reviewed yet
-    const orders = await Order.find({
-      user: req.user.userId,
-      restaurantId,
-      status: "Delivered"
-    }).sort({ createdAt: -1 });
-
-    // Filter out orders that already have reviews
-    const eligibleOrders = [];
-    for (const order of orders) {
-      const review = await Review.findOne({ order: order._id });
-      if (!review) {
-        eligibleOrders.push(order);
-      }
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
-
-    res.json({ orders: eligibleOrders });
+    res.json({ status: order.status });
   } catch (error) {
-    console.error("Error fetching eligible orders:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Error fetching order status:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

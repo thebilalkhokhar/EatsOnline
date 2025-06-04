@@ -1,0 +1,141 @@
+.cart-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  gap: 1.5rem;
+}
+
+.cart-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-details h3 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.item-details p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.quantity-control button {
+  background-color: #ddd;
+  color: #333;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  padding: 0;
+}
+
+.quantity-control button:disabled {
+  background-color: #eee;
+  cursor: not-allowed;
+}
+
+.quantity-control span {
+  font-size: 1.1rem;
+  min-width: 30px;
+  text-align: center;
+}
+
+.remove-btn {
+  background-color: #e04e2d;
+  padding: 0.5rem 1rem;
+}
+
+.cart-summary {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.cart-summary h2 {
+  font-size: 1.5rem;
+  color: #ff5733;
+  margin-bottom: 1rem;
+}
+
+.cart-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.clear-btn {
+  background-color: #666;
+}
+
+.checkout-btn {
+  background-color: #28a745;
+}
+
+.checkout-btn:hover {
+  background-color: #218838;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.empty-cart p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.2rem;
+  color: #ff5733;
+}
+
+@media (max-width: 768px) {
+  .cart-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  .cart-item {
+    flex-direction: column;
+    text-align: center;
+  }
+  .cart-summary {
+    text-align: center;
+  }
+  .cart-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

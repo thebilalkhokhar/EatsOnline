@@ -4,6 +4,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { authMiddleware } = require("../middleware/auth");
+const upload = require("../middleware/upload");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+const fs = require('fs').promises;
 require("dotenv").config();
 
 // @route   POST /api/auth/signup
@@ -117,6 +120,11 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
+    console.log("User data from database:", {
+      id: user._id,
+      profileImage: user.profileImage
+    });
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log("Password mismatch for email:", email);
@@ -129,6 +137,12 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    // Construct the profile image URL if it exists
+    const profileImage = user.profileImage ? {
+      public_id: user.profileImage.public_id,
+      url: user.profileImage.url || `https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/${user.profileImage.public_id}`
+    } : null;
+
     res.json({
       token,
       user: {
@@ -139,6 +153,7 @@ router.post("/login", async (req, res) => {
         addresses: user.addresses,
         role: user.role,
         restaurantId: user.restaurantId,
+        profileImage
       },
     });
   } catch (error) {
@@ -169,6 +184,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       restaurantId: user.restaurantId,
+      profileImage: user.profileImage
     });
   } catch (error) {
     console.error("Profile fetch error:", error);
@@ -177,7 +193,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
 });
 
 // @route   PUT /api/auth/profile
-router.put("/profile", authMiddleware, async (req, res) => {
+router.put("/profile", authMiddleware, upload.single('profileImage'), async (req, res) => {
   const { name, phone, address } = req.body;
 
   try {
@@ -224,17 +240,63 @@ router.put("/profile", authMiddleware, async (req, res) => {
       user.addresses = user.addresses.slice(0, 5);
     }
 
+    // Handle profile image upload
+    if (req.file) {
+      try {
+        // Delete old image from Cloudinary if it exists and is not the default
+        if (user.profileImage.public_id && user.profileImage.public_id !== 'default-profile') {
+          await deleteFromCloudinary(user.profileImage.public_id);
+        }
+
+        // Upload new image to Cloudinary
+        const result = await uploadToCloudinary(req.file.path, 'profile-images');
+        
+        // Update user's profile image with both public_id and url
+        user.profileImage = {
+          public_id: result.public_id,
+          url: result.secure_url
+        };
+
+        // Delete the temporary file
+        await fs.unlink(req.file.path);
+
+        // Log the result for debugging
+        console.log('Cloudinary upload result:', result);
+      } catch (error) {
+        console.error('Error handling profile image:', error);
+        return res.status(500).json({ message: 'Error uploading profile image' });
+      }
+    }
+
     await user.save();
 
+    // Log the user object after save for debugging
+    console.log('Updated user object:', user);
+
+    // Get the latest user data with the profile image URL
+    const updatedUser = await User.findById(user._id).select('-password');
+    let profileImageUrl = updatedUser.profileImage.url;
+    // If the url is missing or is the placeholder, but public_id is not default, construct the Cloudinary URL
+    if (
+      (!profileImageUrl || profileImageUrl.includes('placeholder')) &&
+      updatedUser.profileImage.public_id &&
+      updatedUser.profileImage.public_id !== 'default-profile'
+    ) {
+      profileImageUrl = `https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/${updatedUser.profileImage.public_id}`;
+    }
     res.json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      addresses: user.addresses,
-      role: user.role,
-      updatedAt: user.updatedAt,
-      restaurantId: user.restaurantId
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      addresses: updatedUser.addresses,
+      role: updatedUser.role,
+      updatedAt: updatedUser.updatedAt,
+      restaurantId: updatedUser.restaurantId,
+      profileImage: {
+        public_id: updatedUser.profileImage.public_id,
+        url: profileImageUrl
+      }
     });
   } catch (error) {
     console.error("Profile update error:", error);

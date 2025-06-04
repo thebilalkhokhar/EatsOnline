@@ -230,32 +230,4 @@ router.delete("/:id", adminMiddleware, async (req, res) => {
   }
 });
 
-// Get products by restaurant ID
-router.get("/restaurant/:restaurantId", async (req, res) => {
-  try {
-    const { restaurantId } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
-      return res.status(400).json({ message: "Invalid restaurant ID" });
-    }
-
-    const products = await Product.find({ restaurantId })
-      .populate("category", "name")
-      .select("name category price image stock description");
-
-    // Filter out products with invalid category references
-    const filteredProducts = products.filter((product) => {
-      if (!product.category) {
-        console.warn(`Product ${product._id} has invalid category reference`);
-        return false;
-      }
-      return true;
-    });
-
-    res.json(filteredProducts);
-  } catch (error) {
-    console.error("Error fetching restaurant products:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
 module.exports = router;

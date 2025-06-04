@@ -1,0 +1,129 @@
+.download-app-section {
+  background: #fff;
+  padding: 4rem 1rem 3rem 1rem;
+  text-align: center;
+  border-top: 1px solid #f3f3f3;
+}
+
+.download-app-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.download-app-info {
+  flex: 1 1 350px;
+  min-width: 320px;
+  text-align: left;
+}
+
+.download-app-title {
+  font-size: 2.2rem;
+  color: #ff5733;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+.download-app-desc {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.download-app-buttons {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.app-store-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #222;
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(255,87,51,0.08);
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.app-store-btn.apple {
+  background: #222;
+}
+
+.app-store-btn.google {
+  background: #ff5733;
+}
+
+.app-store-btn.google:hover {
+  background: #ff784e;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 16px rgba(255,87,51,0.15);
+}
+
+.app-store-btn.apple:hover {
+  background: #444;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 16px rgba(34,34,34,0.15);
+}
+
+.store-icon {
+  font-size: 1.5rem;
+}
+
+.download-app-benefits {
+  margin: 1.5rem 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.download-app-benefits li {
+  color: #222;
+  font-size: 1rem;
+  margin-bottom: 0.7rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.download-app-benefits li::before {
+  content: '\2713';
+  color: #ff5733;
+  font-size: 1.1rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.download-app-image {
+  flex: 1 1 300px;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-app-image img {
+  width: 220px;
+  max-width: 100%;
+  border-radius: 2.5rem;
+  box-shadow: 0 8px 32px rgba(255,87,51,0.10);
+  background: #fff0ea;
+}
+
+@media (max-width: 900px) {
+  .download-app-content {
+    flex-direction: column-reverse;
+    gap: 2rem;
+  }
+  .download-app-info {
+    text-align: center;
+  }
+} 

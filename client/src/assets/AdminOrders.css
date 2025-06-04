@@ -1,0 +1,109 @@
+.admin-orders-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-section label {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.filter-section select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.orders-table {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.table-header, .table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.table-header {
+  background-color: #f0f0f0;
+  font-weight: 600;
+  color: #333;
+}
+
+.table-row {
+  border-top: 1px solid #ddd;
+  align-items: center;
+}
+
+.table-row select {
+  padding: 0.5rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.table-row select.pending {
+  background-color: #ff9800;
+}
+
+.table-row select.confirmed {
+  background-color: #2196f3;
+}
+
+.table-row select.preparing {
+  background-color: #9c27b0;
+}
+
+.table-row select.out-for-delivery {
+  background-color: #ff8c00;
+}
+
+.table-row select.delivered {
+  background-color: #4caf50;
+}
+
+.table-row select.cancelled {
+  background-color: #e04e2d;
+}
+
+.table-row button {
+  background-color: #ff5733;
+  padding: 0.5rem;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.2rem;
+  color: #ff5733;
+}
+
+@media (max-width: 768px) {
+  .admin-orders-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .table-header, .table-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}

@@ -1,0 +1,975 @@
+/* Menu Container */
+.container {
+  max-width: 1200px;
+  margin: 80px auto 2rem;
+  padding: 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+/* Menu Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: #2d3436;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.backBtn {
+  padding: 0.5rem 1rem;
+  background-color: #ff5733;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backBtn:hover {
+  background-color: #ff4019;
+  transform: translateY(-2px);
+}
+
+/* Search Bar */
+.searchBar {
+  margin: 1.5rem auto;
+  max-width: 600px;
+  position: relative;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  padding-left: 3rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.searchBar input:focus {
+  outline: none;
+  border-color: #ff5733;
+  box-shadow: 0 0 0 3px rgba(255, 87, 51, 0.1);
+}
+
+.searchBar::before {
+  content: '🔍';
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #636e72;
+  pointer-events: none;
+}
+
+.searchBar input::placeholder {
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+/* Restaurant Grid */
+.restaurants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.restaurant-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+  cursor: pointer;
+  position: relative;
+  padding: 1.5rem;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+}
+
+.restaurant-image {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.restaurant-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.restaurant-card:hover .restaurant-image img {
+  transform: scale(1.05);
+}
+
+.restaurant-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.restaurant-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #636e72;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.restaurant-cuisine {
+  color: #ff5733;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.delivery-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #ff5733;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Products Grid */
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.productCard {
+  background: white;
+  border-radius: 15px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.productCard:hover {
+  transform: translateY(-5px);
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+}
+
+.productImageContainer {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.productCard:hover .productImage {
+  transform: scale(1.05);
+}
+
+.productDetails {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.productName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0;
+}
+
+.productCategory {
+  color: #636e72;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.productDescription {
+  color: #636e72;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.productMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.productPrice {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.productStock {
+  color: #636e72;
+  font-size: 0.9rem;
+}
+
+.addToCartBtn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #ff5733;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.addToCartBtn:hover:not(:disabled) {
+  background-color: #ff4019;
+  transform: translateY(-2px);
+}
+
+.addToCartBtn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Loading and Error States */
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  color: #dc3545;
+}
+
+.noProducts {
+  text-align: center;
+  padding: 2rem;
+  color: #636e72;
+  font-size: 1.1rem;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tab {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #636e72;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab:hover {
+  color: #ff5733;
+  background: rgba(255, 87, 51, 0.1);
+}
+
+.activeTab {
+  color: #ff5733;
+  background: rgba(255, 87, 51, 0.1);
+}
+
+.activeTab::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: #ff5733;
+  border-radius: 2px;
+}
+
+/* Reviews Section */
+.reviewsSection {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reviewsSection h2 {
+  font-size: 1.8rem;
+  color: #2d3748;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.reviewsList {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.reviewCard {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reviewCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.reviewProduct {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.reviewProductImage {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.reviewProductImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reviewProductInfo {
+  flex: 1;
+}
+
+.reviewProductName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  margin-bottom: 0.25rem;
+}
+
+.reviewProductCategory {
+  font-size: 0.875rem;
+  color: #718096;
+  margin: 0;
+}
+
+.reviewRating {
+  display: flex;
+  gap: 0.25rem;
+  color: #ff5733;
+  font-size: 1.1rem;
+}
+
+.reviewDate {
+  font-size: 0.875rem;
+  color: #718096;
+  white-space: nowrap;
+}
+
+.reviewComment {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.reviewComment:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.reviewComment::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-size: 2rem;
+  color: #ff5733;
+  opacity: 0.2;
+}
+
+.reviewComment::after {
+  content: '"';
+  position: absolute;
+  bottom: -20px;
+  right: 10px;
+  font-size: 2rem;
+  color: #ff5733;
+  opacity: 0.2;
+}
+
+.reviewerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.reviewerAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #718096;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.reviewerName {
+  font-size: 0.9rem;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.reviewerRole {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.noReviews {
+  text-align: center;
+  color: #718096;
+  font-size: 1.1rem;
+  padding: 2rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .reviewsList {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewCard {
+    padding: 1rem;
+  }
+
+  .reviewHeader {
+    flex-direction: column;
+  }
+
+  .reviewProduct {
+    width: 100%;
+  }
+
+  .reviewDate {
+    align-self: flex-end;
+  }
+}
+
+/* Restaurant Details Section */
+.restaurantDetails {
+  background: white;
+  border-radius: 15px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid #eee;
+}
+
+.restaurantHeader {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.restaurantLogo {
+  flex-shrink: 0;
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+.restaurantLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurantInfo {
+  flex: 1;
+}
+
+.restaurantInfo h1 {
+  color: #2d3436;
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.restaurantMeta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metaLabel {
+  color: #636e72;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.metaValue {
+  color: #2d3436;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.restaurantDescription {
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+}
+
+.restaurantDescription h3 {
+  color: #2d3436;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.restaurantDescription p {
+  color: #636e72;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 60px 0.5rem 1rem;
+    padding: 0.5rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .restaurants-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .restaurant-image {
+    height: 180px;
+  }
+
+  .productsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .productCard {
+    flex-direction: column;
+  }
+
+  .productImageContainer {
+    width: 100%;
+    height: 200px;
+  }
+
+  .restaurantHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .restaurantLogo {
+    width: 120px;
+    height: 120px;
+  }
+
+  .restaurantInfo h1 {
+    font-size: 1.8rem;
+  }
+
+  .restaurantMeta {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .metaItem {
+    align-items: center;
+  }
+
+  .tabs {
+    gap: 1rem;
+    padding: 0.25rem;
+  }
+
+  .tab {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .searchBar {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  .searchBar input {
+    padding: 0.8rem 1rem;
+    padding-left: 2.5rem;
+  }
+}
+
+/* Menu Section Block */
+.menuSection {
+  background: white;
+  border-radius: 15px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid #eee;
+}
+
+.menuHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.menuTabs {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.menuTab {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #636e72;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.menuTab:hover {
+  color: #ff5733;
+  background: rgba(255, 87, 51, 0.1);
+}
+
+.activeMenuTab {
+  color: #ff5733;
+  background: rgba(255, 87, 51, 0.1);
+}
+
+.activeMenuTab::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: #ff5733;
+  border-radius: 2px;
+}
+
+.menuSearch {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.menuSearch input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  padding-left: 3rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.menuSearch input:focus {
+  outline: none;
+  border-color: #ff5733;
+  box-shadow: 0 0 0 3px rgba(255, 87, 51, 0.1);
+}
+
+.menuSearch::before {
+  content: '🔍';
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #636e72;
+  pointer-events: none;
+}
+
+.menuSearch input::placeholder {
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.menuContent {
+  margin-top: 2rem;
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.menuCard {
+  background: white;
+  border-radius: 15px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuCard:hover {
+  transform: translateY(-5px);
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+}
+
+.menuImageContainer {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.menuImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.menuCard:hover .menuImage {
+  transform: scale(1.05);
+}
+
+.menuDetails {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.menuName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0;
+}
+
+.menuCategory {
+  color: #636e72;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.menuDescription {
+  color: #636e72;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.menuMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.menuPrice {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.menuStock {
+  color: #636e72;
+  font-size: 0.9rem;
+}
+
+.addToCartBtn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #ff5733;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.addToCartBtn:hover:not(:disabled) {
+  background-color: #ff4019;
+  transform: translateY(-2px);
+}
+
+.addToCartBtn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .menuSection {
+    padding: 1rem;
+  }
+
+  .menuTabs {
+    gap: 1rem;
+    padding: 0.25rem;
+  }
+
+  .menuTab {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .menuSearch {
+    padding: 0 1rem;
+  }
+
+  .menuSearch input {
+    padding: 0.8rem 1rem;
+    padding-left: 2.5rem;
+  }
+
+  .menuGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+} 

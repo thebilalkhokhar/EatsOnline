@@ -11,63 +11,10 @@ const fs = require('fs').promises;
 // @desc    Get all active restaurants (public access)
 router.get("/", async (req, res) => {
   try {
-    const restaurants = await Restaurant.find({ isActive: true })
-      .select("name address contact cuisineType deliveryAvailable logo description rating")
-      .lean();
-
-    // Get latest rating stats for each restaurant
-    const Review = require("../models/Review");
-    const restaurantsWithRatings = await Promise.all(
-      restaurants.map(async (restaurant) => {
-        // Get rating statistics
-        const stats = await Review.aggregate([
-          {
-            $match: {
-              restaurant: restaurant._id,
-              status: "approved"
-            }
-          },
-          {
-            $group: {
-              _id: null,
-              averageRating: { $avg: "$rating" },
-              totalReviews: { $sum: 1 },
-              ratingDistribution: {
-                $push: "$rating"
-              }
-            }
-          }
-        ]);
-
-        // Process rating distribution
-        const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        if (stats.length > 0) {
-          stats[0].ratingDistribution.forEach(rating => {
-            distribution[rating] = (distribution[rating] || 0) + 1;
-          });
-        }
-
-        const rating = stats.length > 0 ? {
-          average: stats[0].averageRating,
-          total: stats[0].totalReviews,
-          distribution
-        } : {
-          average: 0,
-          total: 0,
-          distribution
-        };
-
-        // Update restaurant rating in database
-        await Restaurant.findByIdAndUpdate(restaurant._id, { rating });
-
-        return {
-          ...restaurant,
-          rating
-        };
-      })
+    const restaurants = await Restaurant.find({ isActive: true }).select(
+      "name address contact cuisineType deliveryAvailable logo description minimumOrderAmount averageDeliveryTime"
     );
-
-    res.json(restaurantsWithRatings);
+    res.json(restaurants);
   } catch (error) {
     console.error("Fetch restaurants error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -101,16 +48,16 @@ router.post("/", authMiddleware, upload.single('logo'), async (req, res) => {
         .json({ message: "Admin already has a restaurant" });
     }
 
-    let logoData = null;
+    let logoData = {
+      public_id: "default-restaurant",
+      url: "default-logo.jpg"
+    };
 
     if (req.file) {
-      try {
-        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer, 'restaurants');
-        logoData = cloudinaryResponse;
-      } catch (uploadError) {
-        console.error('Error uploading to Cloudinary:', uploadError);
-        return res.status(500).json({ message: "Error uploading image" });
-      }
+      const cloudinaryResponse = await uploadToCloudinary(req.file.path, 'restaurants');
+      logoData = cloudinaryResponse;
+      // Delete the temporary file
+      await fs.unlink(req.file.path);
     }
 
     // Parse cuisineType if it's a string
@@ -168,18 +115,7 @@ router.post("/", authMiddleware, upload.single('logo'), async (req, res) => {
 
 // @route   PUT /api/restaurants/:id
 router.put("/:id", authMiddleware, upload.single('logo'), async (req, res) => {
-  const { 
-    name, 
-    description,
-    address, 
-    contact, 
-    cuisineType, 
-    deliveryAvailable,
-    minimumOrderAmount,
-    averageDeliveryTime,
-    operatingHours
-  } = req.body;
-  
+  const { name, address, contact, cuisineType, deliveryAvailable } = req.body;
   try {
     const user = await User.findById(req.user.userId);
     if (!user) {
@@ -199,30 +135,17 @@ router.put("/:id", authMiddleware, upload.single('logo'), async (req, res) => {
     let logoData = restaurant.logo;
 
     if (req.file) {
-      try {
-        // Delete old logo from Cloudinary if it exists
-        if (restaurant.logo && restaurant.logo.public_id) {
-          try {
-            await deleteFromCloudinary(restaurant.logo.public_id);
-          } catch (deleteError) {
-            console.error('Error deleting old logo:', deleteError);
-            // Continue with upload even if delete fails
-          }
-        }
-        
-        // Upload new logo
-        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer, 'restaurants');
-        if (!cloudinaryResponse || !cloudinaryResponse.public_id || !cloudinaryResponse.url) {
-          throw new Error('Invalid response from Cloudinary');
-        }
-        logoData = cloudinaryResponse;
-      } catch (uploadError) {
-        console.error('Error uploading to Cloudinary:', uploadError);
-        return res.status(500).json({ 
-          message: "Error uploading image",
-          error: uploadError.message 
-        });
+      // Delete old logo from Cloudinary if it exists and is not the default
+      if (restaurant.logo.public_id && restaurant.logo.public_id !== "default-restaurant") {
+        await deleteFromCloudinary(restaurant.logo.public_id);
       }
+      
+      // Upload new logo
+      const cloudinaryResponse = await uploadToCloudinary(req.file.path, 'restaurants');
+      logoData = cloudinaryResponse;
+      
+      // Delete the temporary file
+      await fs.unlink(req.file.path);
     }
 
     // Parse cuisineType if it's a string
@@ -235,53 +158,33 @@ router.put("/:id", authMiddleware, upload.single('logo'), async (req, res) => {
       }
     }
 
-    // Parse operatingHours if it's a string
-    let parsedOperatingHours = operatingHours;
-    if (typeof operatingHours === 'string') {
-      try {
-        parsedOperatingHours = JSON.parse(operatingHours);
-      } catch (e) {
-        console.error('Error parsing operating hours:', e);
-        parsedOperatingHours = restaurant.operatingHours;
-      }
-    }
-
-    const updateData = {
-      name,
-      description,
-      address: {
-        street: address.street || "",
-        city: address.city,
-        country: address.country || "Pakistan",
-        postalCode: address.postalCode || "",
-      },
-      contact: {
-        phone: contact.phone,
-        email: contact.email || "",
-      },
-      cuisineType: parsedCuisineType,
-      deliveryAvailable: deliveryAvailable === 'true' || deliveryAvailable === true,
-      minimumOrderAmount: Number(minimumOrderAmount) || 0,
-      averageDeliveryTime: Number(averageDeliveryTime) || 30,
-      operatingHours: parsedOperatingHours,
-      logo: logoData,
-      isActive: restaurant.isActive
-    };
-
-    console.log('Updating restaurant with data:', updateData);
-
     const updatedRestaurant = await Restaurant.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      {
+        name,
+        address: {
+          street: address.street || "",
+          city: address.city,
+          country: address.country,
+          postalCode: address.postalCode || "",
+        },
+        contact: {
+          phone: contact.phone,
+          email: contact.email || "",
+        },
+        cuisineType: parsedCuisineType,
+        deliveryAvailable: deliveryAvailable === 'true' || deliveryAvailable === true,
+        logo: logoData
+      },
       { new: true, runValidators: true }
     );
 
-    if (!updatedRestaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
-    }
-
     res.json(updatedRestaurant);
   } catch (error) {
+    // Clean up uploaded file if it exists
+    if (req.file) {
+      await fs.unlink(req.file.path).catch(console.error);
+    }
     console.error("Restaurant update error:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -294,75 +197,26 @@ router.put("/:id", authMiddleware, upload.single('logo'), async (req, res) => {
 });
 
 // @route   GET /api/restaurants/:id
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
-    const restaurant = await Restaurant.findById(req.params.id)
-      .select("name address contact cuisineType deliveryAvailable logo description rating minimumOrderAmount")
-      .lean();
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!user.restaurantId || user.restaurantId.toString() !== req.params.id) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this restaurant" });
+    }
 
+    const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    // Get latest rating stats
-    const Review = require("../models/Review");
-    const stats = await Review.aggregate([
-      {
-        $match: {
-          restaurant: restaurant._id,
-          status: "approved"
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          averageRating: { $avg: "$rating" },
-          totalReviews: { $sum: 1 },
-          ratingDistribution: {
-            $push: "$rating"
-          }
-        }
-      }
-    ]);
-
-    // Process rating distribution
-    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    if (stats.length > 0) {
-      stats[0].ratingDistribution.forEach(rating => {
-        distribution[rating] = (distribution[rating] || 0) + 1;
-      });
-    }
-
-    const rating = stats.length > 0 ? {
-      average: stats[0].averageRating,
-      total: stats[0].totalReviews,
-      distribution
-    } : {
-      average: 0,
-      total: 0,
-      distribution
-    };
-
-    // Update restaurant rating in database
-    await Restaurant.findByIdAndUpdate(restaurant._id, {
-      rating: {
-        average: rating.average,
-        total: rating.total,
-        distribution: rating.distribution
-      }
-    });
-
-    console.log('Sending restaurant data:', {
-      ...restaurant,
-      rating
-    });
-
-    res.json({
-      ...restaurant,
-      rating
-    });
+    res.json(restaurant);
   } catch (error) {
-    console.error("Fetch restaurant error:", error);
+    console.error("Restaurant fetch error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });

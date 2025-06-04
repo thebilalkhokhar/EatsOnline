@@ -4,27 +4,15 @@ const uploadToCloudinary = async (file, folder) => {
   try {
     if (!file) return null;
     
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
+    const result = await cloudinary.uploader.upload(file, {
       folder: folder,
       resource_type: "auto"
-        },
-        (error, result) => {
-          if (error) {
-            console.error('Error uploading to Cloudinary:', error);
-            reject(new Error('Error uploading image'));
-          } else {
-            resolve({
+    });
+
+    return {
       public_id: result.public_id,
       url: result.secure_url
-            });
-          }
-        }
-      );
-
-      uploadStream.end(file);
-    });
+    };
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
     throw new Error('Error uploading image');
